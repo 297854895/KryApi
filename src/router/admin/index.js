@@ -1,9 +1,9 @@
 var Router = require('koa-router');
-var frontRouter = new Router();
+var adminRouter = new Router();
 var db = require('../../connectMongoDB');
 
-frontRouter
-.get(
+adminRouter
+.post(
   '/article',
   async (ctx, next) => {
     // ctx.body = await db.model('Article').find({"title": "xx"})
@@ -23,29 +23,32 @@ frontRouter
     //   if (err) return console.error(err);
     //   console.log('success');
     // });
-    // db.model('Article').create({
-    //   "imgUrl": "www.baidu.com",
-    //   "type": "word",
-    //   "title": "This is Title",
-    //   "contxt": "This is content"
-    // }, (err) => {
-    //   if (err) return console.error(err);
-    //   console.log('success');
-    // });
-    console.log('this is get article');
+    if (ctx.request.body) {
+      await db.model('Article').create(ctx.request.body, (err) => {
+        if (err) {
+          //储存失败
+          ctx.status = 500;
+          return;
+        };
+        //存储成功
+        ctx.status = 200;
+      });
+      return;
+    }
+    ctx.status = 204;
   }
 )
-.get(
+.post(
   '/comment',
   async (ctx, next) => {
-    console.log('this is get comment');
+    console.log('this is post comment');
   }
 )
-.get(
+.post(
   '/reply',
   async (ctx, next) => {
-    console.log('this is get reply');
+    console.log('this is post reply');
   }
 );
 
-module.exports = frontRouter;
+module.exports = adminRouter;

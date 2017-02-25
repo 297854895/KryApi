@@ -1,11 +1,11 @@
 var mongoose = require('mongoose');
 
 module.exports = mongoose.model(
-  'Comment',
+  'Reply',
   mongoose.Schema({
     auth: {type: String},
-    contxt: {type: String},
-    cid: {type: String},
+    content: {type: String},
+    commentId: {type: String},
     createTime: {type: Date, default: Date.now}
-  });
+  })
 );

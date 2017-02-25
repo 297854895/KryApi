@@ -9,8 +9,22 @@ mongoose.connect(
        poolSize: 5
      }
    });
+function getConnect() {
+  mongoose.connect(
+    'mongodb://zkc:waa19920626@localhost:27017/kry',
+     {
+       server: {
+         auto_reconnect: true,
+         poolSize: 5
+       }
+     });
+}
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', (err) => {
+  if (err) {
+    getConnect();
+  }
+});
 module.exports = db;
 // db.once('open', function() {
   // we're connected!
