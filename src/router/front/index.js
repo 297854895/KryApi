@@ -50,6 +50,27 @@ frontRouter
                           });
         result = recommend;
         break;
+      case 'type':
+        const webArticle = await db.model('Article')
+                            .find({"type": "web"})
+                            .sort({ 'createTime': 'desc' })
+                            .limit(9)
+                            .select({'_id': true, 'title': true, 'type': true, heart: true, commentNum: true})
+                            .exec((err, data) => {
+                              if (err) return console.error(err);
+                              return data;
+                            });
+        const wordArticle = await db.model('Article')
+                            .find({"type": "word"})
+                            .sort({ 'createTime': 'desc' })
+                            .limit(9)
+                            .select({'_id': true, 'title': true, 'type': true, heart: true, commentNum: true})
+                            .exec((err, data) => {
+                              if (err) return console.error(err);
+                              return data;
+                            });
+        result = {web: webArticle, word: wordArticle};
+        break;
       default:
         result = '';
     }
