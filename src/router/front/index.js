@@ -84,7 +84,35 @@ frontRouter
 .get(
   '/comment',
   async (ctx, next) => {
-    console.log('this is get comment');
+    const _id = ctx.query._id;
+    if (!_id) {
+      ctx.status = 500;
+      return;
+    }
+    const filterKey = ctx.query.filterKey;
+    let filterObj;
+    if (filterKey === 'new' || !filterKey) {
+      filterObj = {'createTime': 'desc'};
+    } else {
+      filterObj = {'thumbNum': 'desc'};
+    }
+    const total = await db.model('Comment')
+                  .count({"aid": _id})
+                  .exec((err, total) => {
+                    if (err) return console.error(err);
+                    return total;
+                  });
+    const comment = await db.model('Comment')
+                      .find({"aid": _id})
+                      .sort(filterObj)
+                      .limit(ctx.query.size)
+                      .skip((ctx.query.index - 1) * ctx.query.size)
+                      .select({'auth': true, 'authPic': true, 'content': true, "createTime": true, relpyNum: true, thumbNum: true, "_id": true, "aid": true})
+                      .exec((err, data) => {
+                        if (err) return console.error(err);
+                        return data;
+                      });
+    ctx.body = {data: comment, total: total, index: parseInt(ctx.query.index), size: parseInt(ctx.query.size)};
   }
 )
 .get(
@@ -96,7 +124,19 @@ frontRouter
 .post(
   '/comment',
   async (ctx, next) => {
-    console.log('this is post comment');
+    if (ctx.request.body) {
+      await db.model('Comment').create(ctx.request.body, (err) => {
+        if (err) {
+          //储存失败
+          ctx.status = 500;
+          return;
+        };
+        //存储成功
+        ctx.status = 200;
+      });
+      return;
+    }
+    ctx.status = 204;
   }
 )
 .post(
