@@ -6,16 +6,13 @@ adminRouter
 .post(
   '/article',
   async (ctx, next) => {
-    console.log('get', ctx.request.body);
     if (ctx.request.body) {
       await db.model('Article').create(ctx.request.body, (err) => {
         if (err) {
           //储存失败
-          console.log(err);
           ctx.status = 500;
           return;
         };
-        console.log('success');
         //存储成功
         ctx.status = 200;
       });
