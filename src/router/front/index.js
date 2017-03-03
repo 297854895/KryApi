@@ -6,6 +6,7 @@ frontRouter
 .get(
   '/article',
   async (ctx, next) => {
+    console.log(123333333);
     const query = ctx.query;
     let result;
     switch (query.type) {
