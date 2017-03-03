@@ -7,12 +7,15 @@ adminRouter
   '/article',
   async (ctx, next) => {
     if (ctx.request.body) {
+      console.log('get', ctx.request.body);
       await db.model('Article').create(ctx.request.body, (err) => {
         if (err) {
           //储存失败
           ctx.status = 500;
+          console.log(err);
           return;
         };
+        console.log('ok');
         //存储成功
         ctx.status = 200;
       });
