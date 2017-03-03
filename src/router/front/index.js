@@ -82,6 +82,33 @@ frontRouter
   }
 )
 .get(
+  '/like',
+  async (ctx, next) => {
+    if (ctx.query._id) {
+      await db.model('Article').update({'_id': ctx.query._id}, {'$inc': {'heart': 1}})
+            .exec(err => {
+              if (err) return console.error(err);;
+              ctx.status = 200;
+            });
+      return;
+    }
+    ctx.status = 500;
+  }
+)
+.get(
+  '/newcomment',
+  async (ctx, next) => {
+    await db.model('Comment')
+            .find({})
+            .sort({ 'createTime': 'desc' })
+            .limit(5)
+            .exec((err, newcomment) => {
+               if (err) return console.error(err);
+               ctx.body = newcomment;
+             });
+  }
+)
+.get(
   '/comment',
   async (ctx, next) => {
     const _id = ctx.query._id;
@@ -125,18 +152,34 @@ frontRouter
   '/comment',
   async (ctx, next) => {
     if (ctx.request.body) {
-      await db.model('Comment').create(ctx.request.body, (err) => {
-        if (err) {
-          //储存失败
-          ctx.status = 500;
-          return;
-        };
-        //存储成功
-        ctx.status = 200;
-      });
-      return;
+      const saveFlag = await db.model('Comment').create(ctx.request.body, (err) => {
+                          if (err) return false;
+                          return true;
+                        });
+      const addFlag = await db.model('Article').update({'_id': ctx.request.body.aid}, {'$inc': {'commentNum': 1}})
+                              .exec(err => {
+                                if (err) return false;
+                                return true;
+                              });
+      if (saveFlag) {
+        // ctx.status = 200;
+        ctx.body = { createTime: new Date(), _id: saveFlag._id};
+        return;
+      };
     }
     ctx.status = 204;
+  }
+)
+.get(
+  '/thumbComment',
+  async (ctx, next) => {
+    if (ctx.query._id) {
+      await db.model('Comment').update({'_id': ctx.query._id}, {'$inc': {'thumbNum': 1}})
+            .exec(err => {
+              if (err) console.error(err);
+              ctx.status = 200;
+            });
+    }
   }
 )
 .post(

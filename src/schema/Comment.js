@@ -6,6 +6,8 @@ module.exports = mongoose.model(
     authPic: {type: Number, default: 1},
     content: {type: String},
     aid: {type: String},
+    title: {type: String},
+    type: {type: String},
     relpyNum: {type: Number, default: 0},
     thumbNum: {type: Number, default: 0},
     createTime: {type: Date, default: Date.now}
